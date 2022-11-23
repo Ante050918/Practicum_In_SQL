@@ -64,7 +64,7 @@ class DataBase:
         self.rightArr.sort()
         self.leftArr.sort()
     
-    #2 donje funkcije ce nac sve atribute kojih nema u rjecniku 
+   
     def checkIfInFR(self, r):
         for k, v in self.fr.items():
             if r in k:
@@ -90,13 +90,13 @@ class DataBase:
             copyDict[''.join(sorted(k))] = v
         return copyDict
 
-    #ako vise ne postoji ni jedna kombinacija s desne strane medu funkcionalnim ovisnostima prosirujemo
+  
     def expand(self, r):
         self.rightArr.extend(r)
         self.leftArr.extend(r)
         self.sortLRSides()
 
-    #radi kombinacije iz desnog niza i provjerava jesu li u funkcionalnim ovisnostima
+   
     def checkRightSide(self):
         for L in range(0, len(self.rightArr)+1):
             for subset in itertools.combinations(self.rightArr, L):
@@ -105,7 +105,6 @@ class DataBase:
                     return True
         return False
 
-    #puni desni niz atributima kojima prosirujemo 
     def addToRightSide(self,key):
         for k,v in self.fr.items():
             if(key == k or ''.join(sorted(k)) == key):
@@ -116,14 +115,14 @@ class DataBase:
                     self.rightArr.extend(el)
         self.sortLRSides()
 
-    #prosit ce desnu stranu svim kombinacijama iz desne strane tj mogucim funkcionalnim ovisnostima
+    
     def makeAllRelations(self):
         for L in range(0, len(self.rightArr)+1):
             for subset in itertools.combinations(self.rightArr, L):
                 komb = ''.join(sorted(subset))
                 self.addToRightSide(komb)
 
-    #vraca relacije koje nemamo
+  
     def returnRelationsExp(self):  
         relArr = []
         for el in self.r:
@@ -143,20 +142,20 @@ class DataBase:
             if(self.checkRightSide()):
                 self.makeAllRelations()
              
-            #ako ne postoji onda prosiri
+          
             else:
                 #expansionArr = self.returnRelationsExp()
                 expansionArr = self.expansionCandidatesBCKP
-                # provjeri sve kandidate za sirenje
+                
                 for r in expansionArr:
                     if r not in self.expansionCandidates and r not in self.usedForExpansion:
                         self.expansionCandidates.extend(r)
                 
-                # ako trenutni kljuc nije kandidat prestajemo s pretragom i brisemo koristene
+              
                 if not self.expansionCandidates:
                     return False
 
-                # uzimamo jednog od kandidata, s kojim sirimo
+               
                 key = self.expansion(self.expansionCandidates) if(self.expansion(self.expansionCandidates)) else self.expansionCandidates[0]
                 
                 self.expansionCandidates.remove(key)
@@ -167,7 +166,7 @@ class DataBase:
         return True
             
     def findCandidateKey(self):
-        #radi dok desna strana nije ista kao relacije, ako ne moze nac vise funkcionalnih ovisnosti vraca false, ako nade kandidata vraca true
+        
         if(self.checkCandidate()):
             stra = ""
             stra = stra.join(self.leftArr)
@@ -189,18 +188,18 @@ class DataBase:
 
     def findKeys(self):
         for r in self.fr:
-            #prosiri livu i desnu stranu sa slovom
+           
             self.expand(r)
             self.addRelNotInFR()
             self.usedForExpansion.clear()
             self.frCopy = self.makeCopyFR()
-            #dodaj u desnu stranu sve moguce kombinacije iz funkcionalnih ovisnosti i obrisi iz rezervnog dictionaryja
+            
             self.addToRightSide(r)
-            #pronaci sve relacije koje moramo provjeriti
+            
             self.expansionCandidatesBCKP = self.returnRelationsExp()
-            #radi dok desna strana nije ista kao relacije ili dok ne moze naci vise kombinacija, kad zavrsi brise livi i desni niz i postavlja novi dict
+            
             self.findCandidateKey()
-            #provjerava sve ostale kandidate za prosirenje s trenutnim slovom
+          
             
             while(self.expansionCandidatesBCKP):
                 self.frCopy = self.makeCopyFR()
@@ -212,12 +211,12 @@ class DataBase:
                 self.findCandidateKey()
  
     def norm_form(self):
-        #kreiramo niz 
+        
         ro =[]
-        #petlja kojom prolazimo kroz funkcijske ovisnosti
+      
         for k,v in self.fr.items():
             print("".join(k) + "->" + "".join(v) +" unija ",ro)
-            #sljedece 2 linije koda pretvaramo kljuc i vrijednost u string da bi ih u trecoj liniji koda lakse zbrojili
+            
             a = "".join(k)
             b = "".join(v)
             if(len(v) > 1):
@@ -231,9 +230,8 @@ class DataBase:
                 c = "".join(sorted(c))
                 if c not in ro:
                   ro.append(c)
-            #zlatna naredba any :-)...provjerava da li igdje u ro-u postoji c(koji je poveznica dva stringa a i b)
             
-        #ukoliko se kljuc ne pojavljuje u ro...dodamo ga
+            
         niz = self.findMinimalKeys()
         d = niz[0]
         if not any(d in f for f in ro):
@@ -245,27 +243,25 @@ class DataBase:
 
 
     def BC_form(self):
-        #stvaramo string i u sljedece 2 linije koda spremamo cilu relaciju u jedan string
+       
             rel = ""
             
             for i in self.r:
                 rel += i
-            
-            #sljedece 3 linije koda kao i u prsoloj funkciji
+        
             for k,v in self.fr.items():
                 print("".join(k) + "->" + "".join(v) + " unija " + rel)
                 a = "".join(k)
                 b = "".join(v)
                 
-                #radimo listu od stringa...odnosno razdvajamo svako slovo za sebe da bi mogli provjerit postoji li cijela desna 
-                # strana negde u stringu relacije
+                
+            
                 c = list(b)
                 
-                #ako postoji....mijenjamo ga sa praznim stringom posto je string nepromjenjiv i ne mozemo brisati elemente
+                
                 if (b in rel):
                     rel = rel.replace(b, "")
-                #sljedeca for petlja provjerava dali cijela desna strana postoji u stringu relacije....ukoliko ne 
-                # postoji ne mozemo brisati ta slova iz relacije
+               
 
                 arr = []
                 for i in c:
@@ -283,8 +279,7 @@ class DataBase:
                 
             print()
             print("REST: ", rel)
-            #kada smo dosli do kraja i vise nemamo FO potrebno je projeriti da li u ostatku postoji kombinacija da se nalazi u minimalnim kljucevima
-            #zbog toga radimo 2 stringa u jedan spemamo kandidate za provjeru(newstr) a u rest spreammo ona slova koja ne postoje u minimalnim kljucevima
+         
             niz = self.findMinimalKeys()
             newstr = ""
             rest = ""
@@ -295,13 +290,13 @@ class DataBase:
                 if not any(e in s for s in f):
                     rest += "".join(e)
             sr = "".join(sorted(newstr))
-            #radimo novi niz gdje sortiramo svaki od minimalnih kljuceva kako bi laske provjerili rjesenje zadatka
+      
             arr2 = []
             for i in niz:
                 res = "".join(sorted(i))
                 arr2.append(res)
             print()
-            #ukoliko postoji rjesenje dobijemo minimalni kljuc koji postoji u min kljucevima koji ce odredivati ostatak(rest)
+           
             if sr in arr2 and rest:
                 print("Imamo rjesenje u kljucevima relacije: ", sr + "->" + rest)
             elif sr in arr2:
